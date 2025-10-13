@@ -61,12 +61,12 @@ The algorithm automatically parses sample information from DIA-NN filenames:
 
 | Patient ID | Original ID | Tissue Type | Fractions |
 |------------|-------------|-------------|-----------|
-| PTN001     | 29801       | PB1, BM, PB | F1, F2, F3 |
-| PTN002     | 29774       | NA          | F1, F2, F3 |
-| PTN003     | 27-5        | PB, BM      | F1, F2, F3 |
-| PTN004     | 29247       | PB          | F1, F2, F3 |
-| PTN005     | 29446       | -           | F1, F2, F3 |
-| Healthy    | JR033       | PB          | F1, F2, F3 |
+| PTN001     | RX847       | PB1, BM, PB | F1, F2, F3 |
+| PTN002     | QM394       | NA          | F1, F2, F3 |
+| PTN003     | KL672       | PB, BM      | F1, F2, F3 |
+| PTN004     | NV138       | PB          | F1, F2, F3 |
+| PTN005     | ZT925       | -           | F1, F2, F3 |
+| Healthy    | BH561       | PB          | F1, F2, F3 |
 
 **Tissue Types:**
 - `PB` = Peripheral Blood
