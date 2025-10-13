@@ -1,15 +1,14 @@
-<<<<<<< HEAD
-# diannr
+diannfiltR
 
 An R package for analyzing DIA-NN (Data Independent Acquisition Neural Networks) proteomics output data.
 
 ## Installation
 
-You can install the development version of diannr from GitHub:
+You can install the development version of diannfiltR from GitHub:
 
 ```r
 # install.packages("devtools")
-devtools::install_github("yourusername/diannr")
+devtools::install_github("jrijn/diannfiltR")
 =======
 # DiaNNData R6 Class-Based Proteomics Analysis
 
@@ -48,6 +47,7 @@ set1$annotate_contaminants()
 ```
 
 ### Filtering Operations
+
 ```r
 # Filter precursors (with/without contaminant removal)
 set1$filter_precursors(remove_contaminants = FALSE)
@@ -58,6 +58,7 @@ set1$filter_genes(remove_contaminants = TRUE)
 ```
 
 ### Analysis Methods
+
 ```r
 # Perform tryptic digestion analysis
 set1$digest_trypsin()
@@ -72,8 +73,8 @@ metadata <- set1$metadata
 
 The algorithm automatically parses sample information from DIA-NN filenames:
 
-| Patient ID | Original ID | Tissue Type | Fractions |
-|------------|-------------|-------------|-----------|
+| Patient ID | Original ID | Tissue Type | Fractions  |
+| ---------- | ----------- | ----------- | ---------- |
 | PTN001     | RX847       | PB1, BM, PB | F1, F2, F3 |
 | PTN002     | QM394       | NA          | F1, F2, F3 |
 | PTN003     | KL672       | PB, BM      | F1, F2, F3 |
@@ -82,6 +83,7 @@ The algorithm automatically parses sample information from DIA-NN filenames:
 | Healthy    | BH561       | PB          | F1, F2, F3 |
 
 **Tissue Types:**
+
 - `PB` = Peripheral Blood
 - `BM` = Bone Marrow
 - `NA` = Not Available/Unspecified
@@ -91,16 +93,19 @@ The algorithm automatically parses sample information from DIA-NN filenames:
 The class-based approach provides comprehensive QC analysis:
 
 ### 1. Contaminant Analysis
+
 - Intensity-based contaminant quantification
 - Type-specific contaminant distribution
 - Sample-wise contamination assessment
 
 ### 2. Precursor Characteristics
+
 - Charge state distribution analysis
 - Missed cleavage assessment
 - Tryptic digestion efficiency
 
 ### 3. Protein Identification
+
 - Ranked intensity plots
 - Sample-wise protein counts
 - Cross-sample comparison metrics
@@ -143,6 +148,7 @@ project/
 ## Usage
 
 <<<<<<< HEAD
+
 ```r
 library(diannr)
 
@@ -182,7 +188,7 @@ diann
 ### Filtering Methods
 
 - `filter_precursors(proteotypic, remove_contaminants)` - Filter precursor data
-- `filter_proteins(proteotypic, min_peptides, remove_contaminants)` - Filter protein data  
+- `filter_proteins(proteotypic, min_peptides, remove_contaminants)` - Filter protein data
 - `filter_genes(proteotypic, min_peptides, remove_contaminants)` - Filter gene data
 
 ### Analysis Methods
@@ -193,10 +199,12 @@ diann
 ## License
 
 MIT License
-=======
+===========
+
 ### Basic Workflow
 
 1. **Initialize the analysis environment:**
+
 ```r
 source("diann_r6_class.R")
 data <- diann_load("report.tsv")
@@ -204,6 +212,7 @@ analysis <- DiaNNData$new(data)
 ```
 
 2. **Configure metadata and contaminants:**
+
 ```r
 # Metadata is automatically parsed from filenames
 analysis$load_contaminants("contaminant_annotation.csv")
@@ -211,12 +220,14 @@ analysis$annotate_contaminants()
 ```
 
 3. **Perform quality control:**
+
 ```r
 analysis$filter_precursors(remove_contaminants = FALSE)
 # Generate QC plots
 ```
 
 4. **Filter and analyze data:**
+
 ```r
 analysis$filter_proteins(remove_contaminants = TRUE)
 analysis$filter_genes(remove_contaminants = TRUE)
@@ -226,6 +237,7 @@ analysis$digest_trypsin()
 ### Advanced Features
 
 The R6 class architecture enables:
+
 - **Method chaining** for streamlined workflows
 - **Custom method addition** for specific analyses
 - **State tracking** throughout the analysis pipeline
@@ -234,21 +246,25 @@ The R6 class architecture enables:
 ## Advantages of Class-Based Approach
 
 ### 1. **Encapsulation**
+
 - All related data and methods contained in single object
 - Prevents data inconsistencies and naming conflicts
 - Simplifies complex analysis workflows
 
 ### 2. **Reproducibility**
+
 - Standardized methods ensure consistent analysis
 - Object state can be saved and restored
 - Clear audit trail of applied transformations
 
 ### 3. **Scalability**
+
 - Easy to extend with new methods and functionality
 - Handles multiple datasets with consistent interface
 - Supports batch processing workflows
 
 ### 4. **Maintainability**
+
 - Centralized code organization
 - Clear separation of concerns
 - Easier debugging and testing
@@ -265,6 +281,7 @@ The algorithm generates comprehensive quality control plots:
 ## Future Development
 
 The R6 framework supports extension for:
+
 - Differential expression analysis methods
 - Statistical testing integration
 - Pathway analysis capabilities
@@ -274,4 +291,3 @@ The R6 framework supports extension for:
 ## License
 
 This project uses open-source R packages and is intended for research purposes. Please cite appropriate packages and methods when using this code.
->>>>>>> 3af1d480143d68db9125635e753942a47013b3c4
