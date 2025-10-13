@@ -1,0 +1,24 @@
+Package: diannr
+Title: Analysis and Processing of DIA-NN Output Data
+Version: 0.1.0
+Authors@R: 
+    person("Joris", "van Rijn", email = "j.m.vanrijn-8@prinsesmaximacentrum.nl", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-2865-4455"))
+Description: Provides R6 classes and functions for analyzing DIA-NN (Data Independent
+    Acquisition Neural Networks) proteomics output data. Features include data filtering,
+    contaminant removal, and proteomics-specific data transformations.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Imports:
+    R6,
+    dplyr,
+    tidyr,
+    readr
+Suggests:
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+Config/testthat/edition: 3
+VignetteBuilder: knitr

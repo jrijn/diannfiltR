@@ -1,0 +1,5 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^diann_r6_class\.R$
+^diann_ref_class\.R$
+^README\.md$

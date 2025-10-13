@@ -1,75 +1,90 @@
-library(tidyverse, quietly = TRUE)
-library(R6)
-
-#' DIA-NN Data Analysis Class
+#' DiaNNData R6 Class for DIA-NN Output Analysis
 #'
-#' An R6 class for processing and analyzing DIA-NN output data.
-#' Provides methods for filtering precursors, proteins, and genes,
-#' as well as contaminant handling and tryptic digest analysis.
+#' @description
+#' An R6 class for processing and analyzing DIA-NN (Data Independent Acquisition
+#' Neural Networks) proteomics output data. Provides methods for data filtering,
+#' contaminant removal, and proteomics-specific transformations.
 #'
-#' @field input_data A data.frame containing the raw DIA-NN output
-#' @field metadata A data.frame with file and run information
-#' @field contaminants A character vector of contaminant protein IDs
-#' @field contaminant_annotations A data.frame with contaminant annotation data
-#' @field parameters A list indicating which data types are available
-#' @field precursors A data.frame with filtered precursor data
-#' @field proteins A data.frame with filtered protein data
-#' @field protein_group A data.frame with filtered protein group data
-#' @field genes A data.frame with filtered gene data
+#' @details
+#' This class provides a structured approach to handle DIA-NN output data with
+#' methods for filtering at different levels (precursors, proteins, genes) and
+#' handling contaminant proteins.
 #'
 #' @examples
 #' \dontrun{
-#' # Create a new DiaNNData object
-#' diann <- DiaNNData$new(input_data = my_data)
+#' # Create a DiaNNData object
+#' diann_data <- DiaNNData$new(input_data = your_diann_output)
 #' 
-#' # Filter precursors
-#' diann$filter_precursors(proteotypic = TRUE)
+#' # Load contaminants and filter data
+#' diann_data$load_contaminants("contaminants.txt")
+#' diann_data$filter_precursors(proteotypic = TRUE, remove_contaminants = TRUE)
 #' 
-#' # Load contaminants and filter
-#' diann$load_contaminants("contaminants.txt")
-#' diann$filter_precursors(remove_contaminants = TRUE)
+#' # Print summary
+#' print(diann_data)
 #' }
 #'
 #' @importFrom R6 R6Class
-#' @importFrom dplyr filter group_by summarise n_distinct left_join mutate replace_na
+#' @importFrom dplyr filter group_by left_join mutate n_distinct summarise
 #' @importFrom readr read_csv read_table
-#' @importFrom tools file_ext
+#' @importFrom tidyr replace_na
 #' @export
-DiaNNData <- R6Class(
+DiaNNData <- R6::R6Class(
   classname = "DiaNNData",
   
   public = list(
-    # Public fields
+    #' @field input_data Original DIA-NN output data
     input_data = NULL,
+    
+    #' @field metadata File and run metadata
     metadata = NULL,
+    
+    #' @field contaminants Vector of contaminant protein IDs
     contaminants = NULL,
+    
+    #' @field contaminant_annotations Detailed contaminant annotations
     contaminant_annotations = NULL,
+    
+    #' @field parameters List of available data types in input
     parameters = NULL,
+    
+    #' @field precursors Filtered precursor data
     precursors = NULL,
+    
+    #' @field proteins Filtered protein data
     proteins = NULL,
+    
+    #' @field protein_group Filtered protein group data
     protein_group = NULL,
+    
+    #' @field genes Filtered gene data
     genes = NULL,
     
-    #' Initialize a new DiaNNData object
+    #' Initialize DiaNNData object
     #'
     #' @param input_data A data.frame containing DIA-NN output data
     #' @param contaminants_file Optional path to contaminants file
+    #'
     #' @return A new DiaNNData object
     initialize = function(input_data, contaminants_file = NULL) {
       # Validate input
       if (!is.data.frame(input_data)) {
-        stop("input_data must be a data.frame")
+        stop("input_data must be a data.frame", call. = FALSE)
       }
       
       self$input_data <- input_data
       
       # Create metadata
-      files <- unique(input_data$File.Name)
-      runs <- unique(input_data$Run)
-      self$metadata <- data.frame(
-        File.Name = files,
-        Run = runs
-      )
+      if (all(c("File.Name", "Run") %in% names(input_data))) {
+        files <- unique(input_data$File.Name)
+        runs <- unique(input_data$Run)
+        self$metadata <- data.frame(
+          File.Name = files,
+          Run = runs
+        )
+      } else {
+        warning("File.Name and/or Run columns not found in input data")
+        self$metadata <- data.frame()
+      }
       
       # Load contaminants if file is provided
       if (!is.null(contaminants_file)) {
@@ -95,8 +110,9 @@ DiaNNData <- R6Class(
     
     #' Load contaminants from file
     #'
-    #' @param file_path Path to the contaminants file
-    #' @return Self (for method chaining)
+    #' @param file_path Path to contaminants file (CSV or text format)
+    #'
+    #' @return Self (invisibly) for method chaining
     load_contaminants = function(file_path) {
       if (!file.exists(file_path)) {
         warning(paste("Contaminants file not found:", file_path))
@@ -105,13 +121,18 @@ DiaNNData <- R6Class(
       }
       
       # Check file extension to determine format
-      if (tools::file_ext(file_path) == "csv") {
+      file_ext <- tolower(sub(".*\\.", "", basename(file_path)))
+      if (file_ext == "csv") {
         # Handle CSV format with Protein.Ids and contaminant columns
         contaminants_data <- readr::read_csv(file_path, show_col_types = FALSE)
         
         # Store both the IDs and the annotation data
-        self$contaminants <- contaminants_data$Protein.Ids
-        self$contaminant_annotations <- contaminants_data
+        if ("Protein.Ids" %in% names(contaminants_data)) {
+          self$contaminants <- contaminants_data$Protein.Ids
+          self$contaminant_annotations <- contaminants_data
+        } else {
+          stop("CSV file must contain 'Protein.Ids' column", call. = FALSE)
+        }
       } else {
         # Handle single column text file format
         self$contaminants <- readr::read_table(
@@ -128,9 +149,8 @@ DiaNNData <- R6Class(
     
     #' Print method for DiaNNData objects
     #'
-    #' @param ... Additional arguments (not used)
     #' @return Self (invisibly)
-    print = function(...) {
+    print = function() {
       cat("DiaNNData Object:\n")
       cat("Parameters:\n")
       cat(" - precursors:\t", self$parameters$precursors, "\n")
@@ -160,12 +180,13 @@ DiaNNData <- R6Class(
     
     #' Filter precursor data
     #'
-    #' @param proteotypic Logical, whether to filter for proteotypic peptides
-    #' @param remove_contaminants Logical, whether to remove contaminants
-    #' @return Self (for method chaining)
+    #' @param proteotypic Logical, filter for proteotypic peptides only
+    #' @param remove_contaminants Logical, remove contaminant proteins
+    #'
+    #' @return Self (invisibly) for method chaining
     filter_precursors = function(proteotypic = TRUE, remove_contaminants = FALSE) {
       if (!self$parameters$precursors) {
-        stop("Precursor data not available in input data")
+        stop("Precursor data not available in input data", call. = FALSE)
       }
       
       result <- self$input_data
@@ -180,21 +201,26 @@ DiaNNData <- R6Class(
         result <- private$remove_contaminants(result)
       }
       
-      # Join with metadata
-      self$precursors <- dplyr::left_join(result, self$metadata, by = c("File.Name", "Run"))
+      # Join with metadata if available
+      if (nrow(self$metadata) > 0) {
+        self$precursors <- dplyr::left_join(result, self$metadata, by = c("File.Name", "Run"))
+      } else {
+        self$precursors <- result
+      }
       
       invisible(self)
     },
     
     #' Filter protein group data
     #'
-    #' @param proteotypic Logical, whether to filter for proteotypic peptides
-    #' @param min_peptides Integer, minimum number of peptides per protein
-    #' @param remove_contaminants Logical, whether to remove contaminants
-    #' @return Self (for method chaining)
+    #' @param proteotypic Logical, filter for proteotypic peptides only
+    #' @param min_peptides Minimum number of peptides per protein
+    #' @param remove_contaminants Logical, remove contaminant proteins
+    #'
+    #' @return Self (invisibly) for method chaining
     filter_proteins = function(proteotypic = TRUE, min_peptides = 2, remove_contaminants = FALSE) {
       if (!self$parameters$protein_group) {
-        stop("Protein group data not available in input data")
+        stop("Protein group data not available in input data", call. = FALSE)
       }
       
       result <- self$input_data
@@ -209,32 +235,46 @@ DiaNNData <- R6Class(
         result <- dplyr::filter(result, Proteotypic == 1)
       }
       
+      # Check required columns exist
+      required_cols <- c("File.Name", "Run", "Protein.Ids", "Stripped.Sequence")
+      missing_cols <- setdiff(required_cols, names(result))
+      if (length(missing_cols) > 0) {
+        stop("Missing required columns: ", paste(missing_cols, collapse = ", "), call. = FALSE)
+      }
+      
       # Group and summarize at protein level
+      group_cols <- intersect(
+        c("File.Name", "Run", "Protein.Ids", "Protein.Names", "PG.Quantity", "PG.Normalised", "PG.MaxLFQ"),
+        names(result)
+      )
+      
       self$protein_group <- result |>
-        dplyr::group_by(
-          File.Name, Run, Protein.Ids, Protein.Names,
-          PG.Quantity, PG.Normalised, PG.MaxLFQ
-        ) |>
+        dplyr::group_by(across(all_of(group_cols))) |>
         dplyr::summarise(
           peptides = dplyr::n_distinct(Stripped.Sequence),
           proteins = dplyr::n_distinct(Protein.Ids),
           .groups = "keep"
         ) |>
-        dplyr::filter(peptides >= min_peptides) |>
-        dplyr::left_join(self$metadata, by = c("File.Name", "Run"))
+        dplyr::filter(peptides >= min_peptides)
+      
+      # Join with metadata if available
+      if (nrow(self$metadata) > 0) {
+        self$protein_group <- dplyr::left_join(self$protein_group, self$metadata, by = c("File.Name", "Run"))
+      }
       
       invisible(self)
     },
     
     #' Filter gene data
     #'
-    #' @param proteotypic Logical, whether to filter for proteotypic peptides
-    #' @param min_peptides Integer, minimum number of peptides per gene
-    #' @param remove_contaminants Logical, whether to remove contaminants
-    #' @return Self (for method chaining)
+    #' @param proteotypic Logical, filter for proteotypic peptides only
+    #' @param min_peptides Minimum number of peptides per gene
+    #' @param remove_contaminants Logical, remove contaminant proteins
+    #'
+    #' @return Self (invisibly) for method chaining
     filter_genes = function(proteotypic = TRUE, min_peptides = 2, remove_contaminants = FALSE) {
       if (!self$parameters$genes) {
-        stop("Genes data not available in input data")
+        stop("Genes data not available in input data", call. = FALSE)
       }
       
       result <- self$input_data
@@ -249,29 +289,46 @@ DiaNNData <- R6Class(
         result <- dplyr::filter(result, Proteotypic == 1)
       }
       
+      # Check required columns exist
+      required_cols <- c("File.Name", "Run", "Genes", "Stripped.Sequence")
+      missing_cols <- setdiff(required_cols, names(result))
+      if (length(missing_cols) > 0) {
+        stop("Missing required columns: ", paste(missing_cols, collapse = ", "), call. = FALSE)
+      }
+      
       # Group and summarize at gene level
+      group_cols <- intersect(
+        c("File.Name", "Run", "Genes", "Genes.Quantity", "Genes.Normalised", "Genes.MaxLFQ"),
+        names(result)
+      )
+      
       self$genes <- result |>
-        dplyr::group_by(
-          File.Name, Run, Genes,
-          Genes.Quantity, Genes.Normalised, Genes.MaxLFQ
-        ) |>
+        dplyr::group_by(across(all_of(group_cols))) |>
         dplyr::summarise(
           peptides = dplyr::n_distinct(Stripped.Sequence),
           proteins = dplyr::n_distinct(Protein.Ids),
           .groups = "keep"
         ) |>
-        dplyr::filter(peptides >= min_peptides) |>
-        dplyr::left_join(self$metadata, by = c("File.Name", "Run"))
+        dplyr::filter(peptides >= min_peptides)
+      
+      # Join with metadata if available
+      if (nrow(self$metadata) > 0) {
+        self$genes <- dplyr::left_join(self$genes, self$metadata, by = c("File.Name", "Run"))
+      }
       
       invisible(self)
     },
     
-    #' Annotate contaminants in the input data
+    #' Annotate contaminants in input data
     #'
-    #' @return Self (for method chaining)
+    #' @return Self (invisibly) for method chaining
     annotate_contaminants = function() {
       if (length(self$contaminants) == 0) {
-        stop("No contaminants loaded. Use load_contaminants() first.")
+        stop("No contaminants loaded. Use load_contaminants() first.", call. = FALSE)
+      }
+      
+      if (!"Protein.Ids" %in% names(self$input_data)) {
+        stop("Protein.Ids column not found in input data", call. = FALSE)
       }
       
       # Create contaminant data frame for joining
@@ -290,27 +347,28 @@ DiaNNData <- R6Class(
       # Join and mark contaminants
       self$input_data <- self$input_data |>
         dplyr::left_join(contaminant_df, by = "Protein.Ids") |>
-        dplyr::mutate(is_contaminant = dplyr::replace_na(is_contaminant, FALSE))
+        dplyr::mutate(is_contaminant = tidyr::replace_na(is_contaminant, FALSE))
       
       invisible(self)
     },
     
-    #' Perform tryptic digest analysis
+    #' Calculate missed cleavages for tryptic peptides
     #'
-    #' @return Self (for method chaining)
+    #' @return Self (invisibly) for method chaining
     digest_trypsin = function() {
       if (nrow(self$precursors) == 0) {
-        stop("No precursor data available. Run filter_precursors() first.")
+        stop("No precursor data available. Run filter_precursors() first.", call. = FALSE)
       }
       
       if (!"Stripped.Sequence" %in% names(self$precursors)) {
-        stop("Stripped.Sequence column not found in precursor data")
+        stop("Stripped.Sequence column not found in precursor data", call. = FALSE)
       }
       
       # Calculate missed cleavages
       self$precursors$missed_cleavages <- sapply(
         self$precursors$Stripped.Sequence, 
         function(x) {
+          # Count K and R not followed by P
           fragments <- strsplit(x, "(?!P)(?<=[RK])", perl = TRUE)[[1]]
           length(fragments) - 1
         }
@@ -328,6 +386,10 @@ DiaNNData <- R6Class(
         return(data)
       }
       
+      if (!"Protein.Ids" %in% names(data)) {
+        stop("Protein.Ids column not found in data", call. = FALSE)
+      }
+      
       # If contaminants haven't been annotated yet, do it temporarily
       if (!"is_contaminant" %in% names(data)) {
         contaminant_df <- data.frame(
@@ -337,7 +399,7 @@ DiaNNData <- R6Class(
         
         data <- data |>
           dplyr::left_join(contaminant_df, by = "Protein.Ids") |>
-          dplyr::mutate(is_contaminant = dplyr::replace_na(is_contaminant, FALSE))
+          dplyr::mutate(is_contaminant = tidyr::replace_na(is_contaminant, FALSE))
       }
       
       dplyr::filter(data, !is_contaminant)
