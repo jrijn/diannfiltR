@@ -113,7 +113,7 @@ DiaNNData <- R6::R6Class(
     #' @param file_path Path to contaminants file (CSV or text format)
     #'
     #' @return Self (invisibly) for method chaining
-    load_contaminants = function(file_path) {
+    load_contaminants = function(file_path = "data/Frankenfield_et_al_2022.txt") {
       if (!file.exists(file_path)) {
         warning(paste("Contaminants file not found:", file_path))
         self$contaminants <- character(0)
@@ -132,6 +132,17 @@ DiaNNData <- R6::R6Class(
           self$contaminant_annotations <- contaminants_data
         } else {
           stop("CSV file must contain 'Protein.Ids' column", call. = FALSE)
+        }
+      } else if (file_ext %in% c("txt", "tsv")) {
+        # Handle tab-separated text file with Protein.Ids and contaminant columns
+        contaminants_data <- readr::read_tsv(file_path, col_names = TRUE, show_col_types = FALSE, skip = 1, name_repair = "universal")
+        
+        # Store both the IDs and the annotation data
+        if ("Protein.Ids" %in% names(contaminants_data)) {
+          self$contaminants <- contaminants_data$Protein.Ids
+          self$contaminant_annotations <- contaminants_data
+        } else {
+          stop("Text file must contain 'Protein.Ids' column", call. = FALSE)
         }
       } else {
         # Handle single column text file format
