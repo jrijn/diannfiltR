@@ -90,7 +90,7 @@ DiaNNData <- R6::R6Class(
       if (!is.null(contaminants_file)) {
         self$load_contaminants(contaminants_file)
       } else {
-        self$contaminants <- character(0)
+        self$contaminants <- self$load_contaminants()
       }
       
       # Define parameters based on column presence
@@ -113,8 +113,15 @@ DiaNNData <- R6::R6Class(
     #' @param file_path Path to contaminants file (CSV or text format)
     #'
     #' @return Self (invisibly) for method chaining
-    load_contaminants = function(file_path = "data/Frankenfield_et_al_2022.txt") {
-      if (!file.exists(file_path)) {
+    load_contaminants = function(file_path = NULL) {
+      # If no file path provided, use default contaminants
+      if (is.null(file_path)) {
+        self$contaminants <- Frankenfield_et_al_2022$Protein.Ids
+        self$contaminant_annotations <- Frankenfield_et_al_2022
+        return(invisible(self))
+
+      # Check if file exists
+      } else if (!file.exists(file_path)) {
         warning(paste("Contaminants file not found:", file_path))
         self$contaminants <- character(0)
         return(invisible(self))
