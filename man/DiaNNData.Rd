@@ -32,21 +32,15 @@ print(diann_data)
 \describe{
 \item{\code{input_data}}{Original DIA-NN output data}
 
+\item{\code{object_type}}{Type of object}
+
 \item{\code{metadata}}{File and run metadata}
 
 \item{\code{contaminants}}{Vector of contaminant protein IDs}
 
 \item{\code{contaminant_annotations}}{Detailed contaminant annotations}
 
-\item{\code{parameters}}{List of available data types in input}
-
-\item{\code{precursors}}{Filtered precursor data}
-
-\item{\code{proteins}}{Filtered protein data}
-
-\item{\code{protein_group}}{Filtered protein group data}
-
-\item{\code{genes}}{Filtered gene data
+\item{\code{parameters}}{List of available data types in input
 Initialize DiaNNData object}
 }
 \if{html}{\out{</div>}}
@@ -57,9 +51,6 @@ Initialize DiaNNData object}
 \item \href{#method-DiaNNData-new}{\code{DiaNNData$new()}}
 \item \href{#method-DiaNNData-load_contaminants}{\code{DiaNNData$load_contaminants()}}
 \item \href{#method-DiaNNData-print}{\code{DiaNNData$print()}}
-\item \href{#method-DiaNNData-filter_precursors}{\code{DiaNNData$filter_precursors()}}
-\item \href{#method-DiaNNData-filter_proteins}{\code{DiaNNData$filter_proteins()}}
-\item \href{#method-DiaNNData-filter_genes}{\code{DiaNNData$filter_genes()}}
 \item \href{#method-DiaNNData-annotate_contaminants}{\code{DiaNNData$annotate_contaminants()}}
 \item \href{#method-DiaNNData-digest_trypsin}{\code{DiaNNData$digest_trypsin()}}
 \item \href{#method-DiaNNData-clone}{\code{DiaNNData$clone()}}
@@ -92,7 +83,7 @@ Load contaminants from file
 \if{latex}{\out{\hypertarget{method-DiaNNData-load_contaminants}{}}}
 \subsection{Method \code{load_contaminants()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiaNNData$load_contaminants(file_path)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{DiaNNData$load_contaminants(file_path = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -117,84 +108,6 @@ Print method for DiaNNData objects
 
 \subsection{Returns}{
 Self (invisibly)
-Filter precursor data
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiaNNData-filter_precursors"></a>}}
-\if{latex}{\out{\hypertarget{method-DiaNNData-filter_precursors}{}}}
-\subsection{Method \code{filter_precursors()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiaNNData$filter_precursors(proteotypic = TRUE, remove_contaminants = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{proteotypic}}{Logical, filter for proteotypic peptides only}
-
-\item{\code{remove_contaminants}}{Logical, remove contaminant proteins}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Self (invisibly) for method chaining
-Filter protein group data
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiaNNData-filter_proteins"></a>}}
-\if{latex}{\out{\hypertarget{method-DiaNNData-filter_proteins}{}}}
-\subsection{Method \code{filter_proteins()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiaNNData$filter_proteins(
-  proteotypic = TRUE,
-  min_peptides = 2,
-  remove_contaminants = FALSE
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{proteotypic}}{Logical, filter for proteotypic peptides only}
-
-\item{\code{min_peptides}}{Minimum number of peptides per protein}
-
-\item{\code{remove_contaminants}}{Logical, remove contaminant proteins}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Self (invisibly) for method chaining
-Filter gene data
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiaNNData-filter_genes"></a>}}
-\if{latex}{\out{\hypertarget{method-DiaNNData-filter_genes}{}}}
-\subsection{Method \code{filter_genes()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiaNNData$filter_genes(
-  proteotypic = TRUE,
-  min_peptides = 2,
-  remove_contaminants = FALSE
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{proteotypic}}{Logical, filter for proteotypic peptides only}
-
-\item{\code{min_peptides}}{Minimum number of peptides per gene}
-
-\item{\code{remove_contaminants}}{Logical, remove contaminant proteins}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Self (invisibly) for method chaining
 Annotate contaminants in input data
 }
 }

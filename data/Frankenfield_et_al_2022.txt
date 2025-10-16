@@ -1,5 +1,5 @@
 Supplemental Table S1: Contaminant protein information in the FASTA library and the potential source of contaminations.							
-Uniprot ID	Entry name	Status	Protein names	Gene names	Organism	Length	Source of Contamination
+Protein.Ids	Entry name	Status	Protein names	Gene names	Organism	Length	Source of Contamination
 P00722	BGAL_ECOLI	reviewed	Beta-galactosidase (Beta-gal) (EC 3.2.1.23) (Lactase)	lacZ b0344 JW0335	Escherichia coli (strain K12)	1024	Bacterial Ecoli
 P09870	CLOS_HATHI	reviewed	Clostripain (EC 3.4.22.8) (Clostridiopeptidase B) [Cleaved into: Clostripain light chain; Clostripain heavy chain]	cloSI	Hathewaya histolytica (Clostridium histolyticum)	526	Enzyme 
 P30879	PEPC_PIG	reviewed	Gastricsin (EC 3.4.23.3) (Pepsinogen C) (Fragment)	PGC	Sus scrofa (Pig)	73	Enzyme 

@@ -34,6 +34,9 @@ DiaNNData <- R6::R6Class(
   public = list(
     #' @field input_data Original DIA-NN output data
     input_data = NULL,
+
+    #' @field object_type Type of object
+    object_type = "DiaNNData",
     
     #' @field metadata File and run metadata
     metadata = NULL,
@@ -47,17 +50,17 @@ DiaNNData <- R6::R6Class(
     #' @field parameters List of available data types in input
     parameters = NULL,
     
-    #' @field precursors Filtered precursor data
-    precursors = NULL,
+    # #' @field precursors Filtered precursor data
+    # precursors = NULL,
     
-    #' @field proteins Filtered protein data
-    proteins = NULL,
+    # #' @field proteins Filtered protein data
+    # proteins = NULL,
     
-    #' @field protein_group Filtered protein group data
-    protein_group = NULL,
+    # #' @field protein_group Filtered protein group data
+    # protein_group = NULL,
     
-    #' @field genes Filtered gene data
-    genes = NULL,
+    # #' @field genes Filtered gene data
+    # genes = NULL,
     
     #' Initialize DiaNNData object
     #'
@@ -101,11 +104,6 @@ DiaNNData <- R6::R6Class(
         genes = any(grepl("^Genes\\.", names(input_data)))
       )
       
-      # Initialize result data frames
-      self$precursors <- data.frame()
-      self$proteins <- data.frame()
-      self$protein_group <- data.frame()
-      self$genes <- data.frame()
     },
     
     #' Load contaminants from file
@@ -191,147 +189,6 @@ DiaNNData <- R6::R6Class(
       }
       if ("Genes" %in% names(self$input_data)) {
         cat(" - ", length(unique(self$input_data$Genes)), " genes\n")
-      }
-      
-      invisible(self)
-    },
-    
-    #' Filter precursor data
-    #'
-    #' @param proteotypic Logical, filter for proteotypic peptides only
-    #' @param remove_contaminants Logical, remove contaminant proteins
-    #'
-    #' @return Self (invisibly) for method chaining
-    filter_precursors = function(proteotypic = TRUE, remove_contaminants = FALSE) {
-      if (!self$parameters$precursors) {
-        stop("Precursor data not available in input data", call. = FALSE)
-      }
-      
-      result <- self$input_data
-      
-      # Filter for proteotypic peptides
-      if (proteotypic && "Proteotypic" %in% names(result)) {
-        result <- dplyr::filter(result, Proteotypic == 1)
-      }
-      
-      # Remove contaminants if requested
-      if (remove_contaminants) {
-        result <- private$remove_contaminants(result)
-      }
-      
-      # Join with metadata if available
-      if (nrow(self$metadata) > 0) {
-        self$precursors <- dplyr::left_join(result, self$metadata, by = c("File.Name", "Run"))
-      } else {
-        self$precursors <- result
-      }
-      
-      invisible(self)
-    },
-    
-    #' Filter protein group data
-    #'
-    #' @param proteotypic Logical, filter for proteotypic peptides only
-    #' @param min_peptides Minimum number of peptides per protein
-    #' @param remove_contaminants Logical, remove contaminant proteins
-    #'
-    #' @return Self (invisibly) for method chaining
-    filter_proteins = function(proteotypic = TRUE, min_peptides = 2, remove_contaminants = FALSE) {
-      if (!self$parameters$protein_group) {
-        stop("Protein group data not available in input data", call. = FALSE)
-      }
-      
-      result <- self$input_data
-      
-      # Remove contaminants if requested
-      if (remove_contaminants) {
-        result <- private$remove_contaminants(result)
-      }
-      
-      # Filter for proteotypic peptides if requested
-      if (proteotypic && "Proteotypic" %in% names(result)) {
-        result <- dplyr::filter(result, Proteotypic == 1)
-      }
-      
-      # Check required columns exist
-      required_cols <- c("File.Name", "Run", "Protein.Ids", "Stripped.Sequence")
-      missing_cols <- setdiff(required_cols, names(result))
-      if (length(missing_cols) > 0) {
-        stop("Missing required columns: ", paste(missing_cols, collapse = ", "), call. = FALSE)
-      }
-      
-      # Group and summarize at protein level
-      group_cols <- intersect(
-        c("File.Name", "Run", "Protein.Ids", "Protein.Names", "PG.Quantity", "PG.Normalised", "PG.MaxLFQ"),
-        names(result)
-      )
-      
-      self$protein_group <- result |>
-        dplyr::group_by(across(all_of(group_cols))) |>
-        dplyr::summarise(
-          peptides = dplyr::n_distinct(Stripped.Sequence),
-          proteins = dplyr::n_distinct(Protein.Ids),
-          .groups = "keep"
-        ) |>
-        dplyr::filter(peptides >= min_peptides)
-      
-      # Join with metadata if available
-      if (nrow(self$metadata) > 0) {
-        self$protein_group <- dplyr::left_join(self$protein_group, self$metadata, by = c("File.Name", "Run"))
-      }
-      
-      invisible(self)
-    },
-    
-    #' Filter gene data
-    #'
-    #' @param proteotypic Logical, filter for proteotypic peptides only
-    #' @param min_peptides Minimum number of peptides per gene
-    #' @param remove_contaminants Logical, remove contaminant proteins
-    #'
-    #' @return Self (invisibly) for method chaining
-    filter_genes = function(proteotypic = TRUE, min_peptides = 2, remove_contaminants = FALSE) {
-      if (!self$parameters$genes) {
-        stop("Genes data not available in input data", call. = FALSE)
-      }
-      
-      result <- self$input_data
-      
-      # Remove contaminants if requested
-      if (remove_contaminants) {
-        result <- private$remove_contaminants(result)
-      }
-      
-      # Filter for proteotypic peptides if requested
-      if (proteotypic && "Proteotypic" %in% names(result)) {
-        result <- dplyr::filter(result, Proteotypic == 1)
-      }
-      
-      # Check required columns exist
-      required_cols <- c("File.Name", "Run", "Genes", "Stripped.Sequence")
-      missing_cols <- setdiff(required_cols, names(result))
-      if (length(missing_cols) > 0) {
-        stop("Missing required columns: ", paste(missing_cols, collapse = ", "), call. = FALSE)
-      }
-      
-      # Group and summarize at gene level
-      group_cols <- intersect(
-        c("File.Name", "Run", "Genes", "Genes.Quantity", "Genes.Normalised", "Genes.MaxLFQ"),
-        names(result)
-      )
-      
-      self$genes <- result |>
-        dplyr::group_by(across(all_of(group_cols))) |>
-        dplyr::summarise(
-          peptides = dplyr::n_distinct(Stripped.Sequence),
-          proteins = dplyr::n_distinct(Protein.Ids),
-          .groups = "keep"
-        ) |>
-        dplyr::filter(peptides >= min_peptides)
-      
-      # Join with metadata if available
-      if (nrow(self$metadata) > 0) {
-        self$genes <- dplyr::left_join(self$genes, self$metadata, by = c("File.Name", "Run"))
       }
       
       invisible(self)
