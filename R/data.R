@@ -17,3 +17,34 @@
 #' }
 #' @source Frankenfield et al. 2022 Supplemental Table S1
 "Frankenfield_et_al_2022"
+
+#' Surface Protein Annotation Tool (SPAT) — 2024-06-06
+#'
+#' A dataset from the Surface Protein Annotation Tool (SPAT), providing 
+#' annotations for human surface proteins including confidence scores, 
+#' red flag and secreted flag evidence, and supporting information from 
+#' resources such as NextProt and the Human Protein Atlas (HPA).
+#'
+#' This dataset was downloaded from the SPAT web portal 
+#' (\url{https://spat.leucegene.ca/}) on 2024-06-06.
+#'
+#' @format A data frame with 6,041 rows and 15 variables:
+#' \describe{
+#'   \item{INPUT}{Original identifier or query term used in SPAT.}
+#'   \item{GENE_NAME}{HGNC-approved gene symbol.}
+#'   \item{SPAT_SCORE}{Integer confidence score for surface protein annotation.}
+#'   \item{PUBMED_IDs}{Supporting PubMed IDs or GO terms associated with evidence.}
+#'   \item{RED_FLAG_COUNT}{Number of red flag terms indicating non-surface localization.}
+#'   \item{RED_FLAG_TERMS}{Comma-separated list of red flag terms.}
+#'   \item{SECRETED_FLAG_COUNT}{Number of secreted flag terms indicating secretion evidence.}
+#'   \item{SECRETED_FLAG_TERMS}{Comma-separated list of secreted flag terms.}
+#'   \item{MAIN_LOCATION_NEXTPROT}{Main subcellular localization from NextProt.}
+#'   \item{MAIN_LOCATION_HPA}{Main subcellular localization from the Human Protein Atlas (HPA).}
+#'   \item{APPROVED_ANTIBODY(see https://antibodyregistry.org/)}{Antibody identifiers approved in the Antibody Registry.}
+#'   \item{SIGNIFICANT_PROGNOSTIC_VALUE_HPA}{Prognostic significance in cancer types from HPA.}
+#'   \item{TISSUE_RNA_HPA(NX)}{Normalized RNA expression levels (NX) from HPA by tissue.}
+#'   \item{TISSUE_PROT_HPA(level)}{Protein expression levels from HPA by tissue and cell type.}
+#'   \item{HEMOGENE_RNA(TPM)}{RNA expression levels (TPM) across hematopoietic cell types from HEMOGENE.}
+#' }
+#' @source Surface Protein Annotation Tool (SPAT): \url{https://spat.leucegene.ca/}
+"SPAT_annotation_2024_06_06"

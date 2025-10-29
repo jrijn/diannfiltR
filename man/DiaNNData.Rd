@@ -20,7 +20,7 @@ diann_data <- DiaNNData$new(input_data = your_diann_output)
 
 # Load contaminants and filter data
 diann_data$load_contaminants("contaminants.txt")
-diann_data$filter_precursors(proteotypic = TRUE, remove_contaminants = TRUE)
+diann_data$annotate_contaminants()
 
 # Print summary
 print(diann_data)
@@ -30,18 +30,13 @@ print(diann_data)
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{input_data}}{Original DIA-NN output data}
+\item{\code{input_data}}{data.frame. Original DIA-NN output data}
 
-\item{\code{object_type}}{Type of object}
+\item{\code{metadata}}{data.frame. File and run metadata extracted from input data}
 
-\item{\code{metadata}}{File and run metadata}
+\item{\code{contaminants}}{data.frame. Contaminant protein annotations (default: Frankenfield et al. 2022)}
 
-\item{\code{contaminants}}{Vector of contaminant protein IDs}
-
-\item{\code{contaminant_annotations}}{Detailed contaminant annotations}
-
-\item{\code{parameters}}{List of available data types in input
-Initialize DiaNNData object}
+\item{\code{parameters}}{list. Available data types detected in input (precursors, proteins, protein_group, genes)}
 }
 \if{html}{\out{</div>}}
 }
@@ -49,10 +44,8 @@ Initialize DiaNNData object}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-DiaNNData-new}{\code{DiaNNData$new()}}
-\item \href{#method-DiaNNData-load_contaminants}{\code{DiaNNData$load_contaminants()}}
 \item \href{#method-DiaNNData-print}{\code{DiaNNData$print()}}
-\item \href{#method-DiaNNData-annotate_contaminants}{\code{DiaNNData$annotate_contaminants()}}
-\item \href{#method-DiaNNData-digest_trypsin}{\code{DiaNNData$digest_trypsin()}}
+\item \href{#method-DiaNNData-load_contaminants}{\code{DiaNNData$load_contaminants()}}
 \item \href{#method-DiaNNData-clone}{\code{DiaNNData$clone()}}
 }
 }
@@ -60,6 +53,7 @@ Initialize DiaNNData object}
 \if{html}{\out{<a id="method-DiaNNData-new"></a>}}
 \if{latex}{\out{\hypertarget{method-DiaNNData-new}{}}}
 \subsection{Method \code{new()}}{
+Initialize DiaNNData object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiaNNData$new(input_data, contaminants_file = NULL)}\if{html}{\out{</div>}}
 }
@@ -75,13 +69,26 @@ Initialize DiaNNData object}
 }
 \subsection{Returns}{
 A new DiaNNData object
-Load contaminants from file
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-DiaNNData-print"></a>}}
+\if{latex}{\out{\hypertarget{method-DiaNNData-print}{}}}
+\subsection{Method \code{print()}}{
+Print summary of DiaNNData object
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{DiaNNData$print()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Invisibly returns the DiaNNData object
 }
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-DiaNNData-load_contaminants"></a>}}
 \if{latex}{\out{\hypertarget{method-DiaNNData-load_contaminants}{}}}
 \subsection{Method \code{load_contaminants()}}{
+Load contaminants from file
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{DiaNNData$load_contaminants(file_path = NULL)}\if{html}{\out{</div>}}
 }
@@ -89,51 +96,12 @@ Load contaminants from file
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{file_path}}{Path to contaminants file (CSV or text format)}
+\item{\code{file_path}}{Optional path to contaminants file (CSV or tab-separated text)}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-Self (invisibly) for method chaining
-Print method for DiaNNData objects
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiaNNData-print"></a>}}
-\if{latex}{\out{\hypertarget{method-DiaNNData-print}{}}}
-\subsection{Method \code{print()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiaNNData$print()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Self (invisibly)
-Annotate contaminants in input data
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiaNNData-annotate_contaminants"></a>}}
-\if{latex}{\out{\hypertarget{method-DiaNNData-annotate_contaminants}{}}}
-\subsection{Method \code{annotate_contaminants()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiaNNData$annotate_contaminants()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Self (invisibly) for method chaining
-Calculate missed cleavages for tryptic peptides
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-DiaNNData-digest_trypsin"></a>}}
-\if{latex}{\out{\hypertarget{method-DiaNNData-digest_trypsin}{}}}
-\subsection{Method \code{digest_trypsin()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{DiaNNData$digest_trypsin()}\if{html}{\out{</div>}}
-}
-
-\subsection{Returns}{
-Self (invisibly) for method chaining
+Invisibly returns the DiaNNData object
 }
 }
 \if{html}{\out{<hr>}}
